@@ -74,20 +74,39 @@ public class JellyManager {
         return result;
     }
 
+    public static char[][] findArray(String sessionId) {
+        String sql = "select array from array where id = ?";
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, sessionId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    String array = rs.getString("array");
+                    return ArrayUtil.string2Array(array);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static String saveArray(char[][] array) {
 
         String sql = "insert into array values(?,?)";
 
         String arrayText = ArrayUtil.array2String(array);
-        String id = null;
+        String sessionId = null;
 
         try (Connection connection = DBUtil.getConnection()) {
             int count = 100;
             while (count-- > 0) {
-                id = CommonUtil.randomKey(String.valueOf(System.currentTimeMillis()), 20);
-                synchronized (id.intern()) {
+                sessionId = CommonUtil.randomKey(String.valueOf(System.currentTimeMillis()), 20);
+                synchronized (sessionId.intern()) {
                     try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                        preparedStatement.setString(1, id);
+                        preparedStatement.setString(1, sessionId);
                         preparedStatement.setString(2, arrayText);
 
                         preparedStatement.execute();
@@ -101,7 +120,7 @@ public class JellyManager {
             e.printStackTrace();
         }
 
-        return id;
+        return sessionId;
     }
 
     public static void updateArray(String id, char[][] array) {

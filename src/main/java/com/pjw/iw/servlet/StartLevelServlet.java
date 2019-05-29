@@ -25,7 +25,7 @@ public class StartLevelServlet extends HttpServlet {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
 
-        String errorInfo = ServletUtil.INVALID_PARAM_TEXT;
+        boolean success = false;
 
         try {
             int level = Integer.parseInt(request.getParameter("level"));
@@ -34,28 +34,21 @@ public class StartLevelServlet extends HttpServlet {
                 char[][] array = JellyManager.getArrayByLevel(level);
                 String id = JellyManager.saveArray(array);
 
-                PrintWriter writer = response.getWriter();
-                writer.println(id);
-                for (char[] chars : array) {
-                    for (int i = 0; i < chars.length; i++) {
-                        char c = chars[i];
-                        if (i == chars.length - 1) {
-                            writer.println(c);
-                        } else {
-                            writer.print(c);
-                        }
-                    }
-                }
+                if (id != null) {
+                    PrintWriter writer = response.getWriter();
+                    writer.println(id);
+                    ServletUtil.printCharArray(array, writer);
 
-                errorInfo = null;
+                    success = true;
+                }
             }
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
 
-        if (errorInfo != null) {
-            response.getWriter().write(errorInfo);
+        if (!success) {
+            response.getWriter().write(ServletUtil.INVALID_PARAM_TEXT);
         }
     }
 }
