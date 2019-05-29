@@ -10,8 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.pjw.iw.jelly.JellyAssistant;
-import com.pjw.iw.jelly.JellyManager;
-import com.pjw.iw.util.ArrayUtil;
+import com.pjw.iw.jelly.JellyBomb;
 import com.pjw.iw.util.ServletUtil;
 
 /**
@@ -38,12 +37,12 @@ public class MoveServlet extends HttpServlet {
                     && sessionId != null && !sessionId.isEmpty()) {
 
                 synchronized (sessionId.intern()) {
-                    char[][] array = JellyManager.findArray(sessionId);
+                    char[][] array = JellyAssistant.findArray(sessionId);
                     if (array != null) {
                         //...
-                        array = ArrayUtil.generateArray();
+                        JellyBomb.explode(row0, col0, row1, col1, array);
 
-                        JellyManager.updateArray(sessionId, array);
+                        JellyAssistant.updateArray(sessionId, array);
 
                         ServletUtil.printCharArray(array, response.getWriter());
                         success = true;

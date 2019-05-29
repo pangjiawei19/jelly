@@ -32,7 +32,7 @@ public class StartLevelServlet extends HttpServlet {
 
             if (JellyAssistant.isValidLevel(level)) {
                 char[][] array = JellyManager.getArrayByLevel(level);
-                String id = JellyManager.saveArray(array);
+                String id = JellyAssistant.saveArray(array);
 
                 if (id != null) {
                     PrintWriter writer = response.getWriter();

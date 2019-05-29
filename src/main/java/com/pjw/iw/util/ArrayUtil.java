@@ -1,10 +1,10 @@
 package com.pjw.iw.util;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import com.pjw.iw.db.DBUtil;
-import com.pjw.iw.jelly.JellyManager;
+import com.pjw.iw.jelly.JellyAssistant;
+import com.pjw.iw.jelly.JellyBomb;
 
 /**
  * @author pangjiawei - [Created on 2019/5/29 17:24]
@@ -52,7 +52,7 @@ public class ArrayUtil {
 
     public static void main(String[] args) throws Exception {
 
-        char[][] c = generateArray();
+        char[][] c = JellyBomb.randomJellyArray();
         System.out.println(Arrays.deepToString(c));
 //
 //        String text = array2String(c);
@@ -61,21 +61,9 @@ public class ArrayUtil {
 //        System.out.println(Arrays.deepToString(string2Array(text)));
 
         DBUtil.init();
-        String id = JellyManager.saveArray(c);
+        String id = JellyAssistant.saveArray(c);
 
-        JellyManager.updateArray(id, generateArray());
+        JellyAssistant.updateArray(id, JellyBomb.randomJellyArray());
 
-    }
-
-    public static char[][] generateArray() {
-        char[][] c = new char[8][8];
-
-        Random random = new Random();
-        for (int i = 0; i < c.length; i++) {
-            for (int j = 0; j < c[i].length; j++) {
-                c[i][j] = (char) ('A' + random.nextInt(10));
-            }
-        }
-        return c;
     }
 }
