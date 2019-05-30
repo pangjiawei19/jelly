@@ -39,11 +39,8 @@ public class MoveServlet extends HttpServlet {
                 synchronized (sessionId.intern()) {
                     char[][] array = JellyAssistant.findArray(sessionId);
                     if (array != null) {
-                        //...
                         JellyBomb.explode(row0, col0, row1, col1, array);
-
                         JellyAssistant.updateArray(sessionId, array);
-
                         ServletUtil.printCharArray(array, response.getWriter());
                         success = true;
                     }

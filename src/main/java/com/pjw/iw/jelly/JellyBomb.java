@@ -44,47 +44,24 @@ public class JellyBomb {
         return array;
     }
 
-    public static void printBombArray(char[][] array) {
-        for (char[] chars : array) {
-            for (char c : chars) {
-                System.out.print(c);
-            }
-            System.out.println();
-        }
-    }
-
     public static void main(String[] args) {
         char[][] c = randomJellyArray();
-//        c[0][0]='H';
+        c[0][0] = 'H';
 //        c[0][4]='S';
 //        c[2][1]='S';
 //        c[3][4]='V';
 //        c[4][1]='H';
 //        c[5][0]='S';
 //        c[5][5]='S';
-        printBombArray(c);
+        JellyAssistant.printBombArray(c);
 
         explode(0, 0, 0, 0, c);
-
-//        explode(1, 0, 1, 2, c);
-//        System.out.println();
-//        printBombArray(c);
-//
-//        explode(5, 0, 6, 2, c);
         System.out.println();
-        printBombArray(c);
+        JellyAssistant.printBombArray(c);
     }
 
     public static void explode(int startRow, int startCol, int endRow, int endCol, char[][] array) {
         Queue<Integer> queue = new ArrayDeque<>();
-
-//        int[] startPoint = JellyAssistant.calculateRowByPointNum(start);
-//        int startRow = startPoint[0];
-//        int startCol = startPoint[1];
-//
-//        int[] endPoint = JellyAssistant.calculateRowByPointNum(end);
-//        int endRow = endPoint[0];
-//        int endCol = endPoint[1];
 
         for (int i = startRow; i <= endRow; i++) {
             for (int j = startCol; j <= endCol; j++) {
@@ -118,13 +95,22 @@ public class JellyBomb {
 
                     if (relatedNum != null) {
                         for (int num : relatedNum) {
-                            queue.offer(num);
+                            if (getBombByPointNum(array, num) != BOMB_NONE) {
+                                queue.offer(num);
+                            }
                         }
                     }
                 }
             }
-
         }
+
+        dropByCol(array);
+    }
+
+    private static int getBombByPointNum(char[][] array, int pointNum) {
+        int pointRow = JellyAssistant.calculateRowByPointNum(pointNum);
+        int pointCol = JellyAssistant.calculateColByPointNum(pointNum);
+        return array[pointRow][pointCol];
     }
 
     private static int[] getRelatedPointByHorizontal(int pointNum) {
@@ -178,5 +164,32 @@ public class JellyBomb {
             }
         }
         return result;
+    }
+
+    /**
+     * 按列下落炸弹，空位随机补充炸弹
+     */
+    private static void dropByCol(char[][] array) {
+        int rowCount = array.length;
+        int colCount = array[0].length;
+
+        for (int col = 0; col < colCount; col++) {
+            int writeIndex = rowCount - 1;
+            int readIndex = writeIndex;
+
+            while (readIndex >= 0) {
+                if (array[readIndex][col] != BOMB_NONE) {
+                    array[writeIndex--][col] = array[readIndex][col];
+                }
+
+                readIndex--;
+            }
+
+            while (writeIndex >= 0) {
+                array[writeIndex][col] = randomBomb();
+
+                writeIndex--;
+            }
+        }
     }
 }

@@ -16,8 +16,8 @@ public class StartupListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 
         try {
-            //db初始化
-            this.initDb();
+            //DB初始化
+            DBUtil.init();
 
             //果冻模块初始化
             JellyManager.init();
@@ -49,12 +49,5 @@ public class StartupListener implements ServletContextListener {
                 "\\____/ \\___|_|_|\\__, | \\____/ \\__\\___/| .__/ \\___|\\__,_| (_)\n" +
                 "                 __/ |                | |                   \n" +
                 "                |___/                 |_|                   ");
-    }
-
-    /**
-     * 初始化数据库连接相关
-     */
-    private void initDb() throws Exception {
-        DBUtil.init();
     }
 }

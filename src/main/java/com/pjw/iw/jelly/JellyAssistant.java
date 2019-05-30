@@ -103,7 +103,7 @@ public class JellyAssistant {
                         preparedStatement.setString(1, sessionId);
                         preparedStatement.setString(2, arrayText);
 
-                        preparedStatement.execute();
+                        preparedStatement.executeUpdate();
                         break;
                     } catch (SQLException e1) {
                         e1.printStackTrace();
@@ -128,14 +128,16 @@ public class JellyAssistant {
                 preparedStatement.setString(1, arrayText);
                 preparedStatement.setString(2, sessionId);
 
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void generateInitialArray() {
+    public static Map<Integer, char[][]> generateInitialArray() {
+        Map<Integer, char[][]> map = new HashMap<>();
+
         String sql = "insert into level values(?,?)";
         for (int level = JellyManager.LEVEL_MIN; level <= JellyManager.LEVEL_MAX; level++) {
             char[][] array = JellyBomb.randomJellyArray();
@@ -145,10 +147,23 @@ public class JellyAssistant {
                 preparedStatement.setInt(1, level);
                 preparedStatement.setString(2, ArrayUtil.array2String(array));
 
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
+
+                map.put(level, array);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+
+        return map;
+    }
+
+    public static void printBombArray(char[][] array) {
+        for (char[] chars : array) {
+            for (char c : chars) {
+                System.out.print(c);
+            }
+            System.out.println();
         }
     }
 }
