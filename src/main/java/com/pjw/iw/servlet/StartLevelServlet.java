@@ -28,15 +28,24 @@ public class StartLevelServlet extends HttpServlet {
         boolean success = false;
 
         try {
+            //取参数
             int level = Integer.parseInt(request.getParameter("level"));
 
+            //判断等级有效性
             if (JellyAssistant.isValidLevel(level)) {
-                char[][] array = JellyManager.getArrayByLevel(level);
-                String id = JellyAssistant.saveArray(array);
+                //获得初始布局
+                char[][] array = JellyManager.getInitialArrayByLevel(level);
 
-                if (id != null) {
+                //创建一场游戏并存储
+                String sessionId = JellyAssistant.saveArray(array);
+
+                if (sessionId != null) {
                     PrintWriter writer = response.getWriter();
-                    writer.println(id);
+
+                    //写入sessionId
+                    writer.println(sessionId);
+
+                    //写入布局信息
                     ServletUtil.printCharArray(array, writer);
 
                     success = true;

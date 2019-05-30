@@ -1,16 +1,15 @@
 package com.pjw.iw.util;
 
-import java.util.Arrays;
-
-import com.pjw.iw.db.DBUtil;
-import com.pjw.iw.jelly.JellyAssistant;
-import com.pjw.iw.jelly.JellyBomb;
-
 /**
+ * 数组工具类
+ *
  * @author pangjiawei - [Created on 2019/5/29 17:24]
  */
 public class ArrayUtil {
 
+    /**
+     * 二维数组转字符串，如果数组为null或空，返回字符串"null"
+     */
     public static String array2String(char[][] array) {
         if (array == null || array.length < 1) {
             return "null";
@@ -28,6 +27,11 @@ public class ArrayUtil {
         return builder.substring(0, builder.length() - 1);
     }
 
+    /**
+     * 字符串转二维数组，如果文本不符合格式则返回null
+     *
+     * @param text 必须是{@link ArrayUtil#array2String(char[][])}返回的字符串
+     */
     public static char[][] string2Array(String text) {
         if (text == null || text.isEmpty() || text.equals("null")) {
             return null;
@@ -48,22 +52,5 @@ public class ArrayUtil {
         }
 
         return array;
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        char[][] c = JellyBomb.randomJellyArray();
-        System.out.println(Arrays.deepToString(c));
-//
-//        String text = array2String(c);
-//        System.out.println(text);
-//
-//        System.out.println(Arrays.deepToString(string2Array(text)));
-
-        DBUtil.init();
-        String id = JellyAssistant.saveArray(c);
-
-        JellyAssistant.updateArray(id, JellyBomb.randomJellyArray());
-
     }
 }

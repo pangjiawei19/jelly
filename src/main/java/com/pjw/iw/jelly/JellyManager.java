@@ -20,9 +20,9 @@ public class JellyManager {
     private static final JellyManager instance = new JellyManager();
 
     /**
-     * 等级对应初始布局，key：level，value：布局二维数组
+     * 等级对应初始布局，key：level，value：初始布局二维数组
      */
-    private static Map<Integer, char[][]> levelArray = new HashMap<>();
+    private static Map<Integer, char[][]> level2InitialArray = new HashMap<>();
 
     private JellyManager() {
 
@@ -36,20 +36,38 @@ public class JellyManager {
      * 初始化，加载初始布局，如果不存在随机创建并保存
      */
     public static void init() {
+        //加载初始布局
         loadInitialArray();
 
-        if (levelArray.isEmpty()) {
-            levelArray.putAll(JellyAssistant.generateInitialArray());
+        //遍历各个等级，如果未加载则创建并存储
+        for (int level = JellyManager.LEVEL_MIN; level <= JellyManager.LEVEL_MAX; level++) {
+            if (!level2InitialArray.containsKey(level)) {
+                //随机一组布局
+                char[][] array = JellyBomb.randomJellyArray();
+
+                //存储初始布局
+                if (JellyAssistant.saveInitialArray(level, array)) {
+                    level2InitialArray.put(level, array);
+                } else {
+                    throw new RuntimeException("save initial array error, level:" + level);
+                }
+            }
         }
     }
 
+    /**
+     * 加载初始布局
+     */
     public static void loadInitialArray() {
-        levelArray.clear();
-        levelArray.putAll(JellyAssistant.findAllLevelArray());
+        level2InitialArray.clear();
+        level2InitialArray.putAll(JellyAssistant.findAllInitialArray());
     }
 
-    public static char[][] getArrayByLevel(int level) {
-        char[][] array = levelArray.get(level);
+    /**
+     * 获得指定等级对应的初始布局（副本）
+     */
+    public static char[][] getInitialArrayByLevel(int level) {
+        char[][] array = level2InitialArray.get(level);
         char[][] result = new char[array.length][];
         for (int i = 0; i < array.length; i++) {
             result[i] = Arrays.copyOf(array[i], array[i].length);

@@ -6,63 +6,46 @@ import java.util.Random;
 
 public class JellyBomb {
 
-    public static final char BOMB_NONE = 'N';
-    public static final char BOMB_NORMAL = 'B';
-    public static final char BOMB_HORIZONTAL = 'H';
-    public static final char BOMB_VERTICAL = 'V';
-    public static final char BOMB_SQUARE = 'S';
+    public static final char JELLY_NONE = 'N';
+    public static final char JELLY_NORMAL = 'B';
+    public static final char JELLY_HORIZONTAL = 'H';
+    public static final char JELLY_VERTICAL = 'V';
+    public static final char JELLY_SQUARE = 'S';
 
 
     private static Random random = new Random();
-    private static char[] bombTypes = new char[]{BOMB_NORMAL, BOMB_HORIZONTAL, BOMB_VERTICAL, BOMB_SQUARE};
+    private static char[] jellyTypes = new char[]{JELLY_NORMAL, JELLY_HORIZONTAL, JELLY_VERTICAL, JELLY_SQUARE};
 
-    public static char randomBomb() {
-        double ratio = Math.random();
-        if (ratio < 0.7) {
-            return BOMB_NORMAL;
-        } else if (ratio < 0.8) {
-            return BOMB_HORIZONTAL;
-        } else if (ratio < 0.9) {
-            return BOMB_VERTICAL;
-        } else {
-            return BOMB_SQUARE;
-        }
-
-//        return bombTypes[random.nextInt(bombTypes.length)];
+    /**
+     * 随机一个果冻，各种类型果冻概率均等
+     */
+    public static char randomJelly() {
+        return jellyTypes[random.nextInt(jellyTypes.length)];
     }
 
+    /**
+     * 随机生成一组游戏布局
+     */
     public static char[][] randomJellyArray() {
         char[][] array = new char[JellyManager.JELLY_ARRAY_ROW_COUNT][JellyManager.JELLY_ARRAY_COL_COUNT];
 
         for (int i = 0; i < array.length; i++) {
             char[] c = array[i];
             for (int j = 0; j < c.length; j++) {
-                array[i][j] = randomBomb();
-//                array[i][j] = 'B';
+                array[i][j] = randomJelly();
             }
         }
         return array;
     }
 
-    public static void main(String[] args) {
-        char[][] c = randomJellyArray();
-        c[0][0] = 'H';
-//        c[0][4]='S';
-//        c[2][1]='S';
-//        c[3][4]='V';
-//        c[4][1]='H';
-//        c[5][0]='S';
-//        c[5][5]='S';
-        JellyAssistant.printBombArray(c);
-
-        explode(0, 0, 0, 0, c);
-        System.out.println();
-        JellyAssistant.printBombArray(c);
-    }
-
+    /**
+     * 根据指定区域参数对指定布局进行消除，本方法认为所传参数均有效，如无效则可能抛出异常
+     */
     public static void explode(int startRow, int startCol, int endRow, int endCol, char[][] array) {
+        //待消除队列，存储需要消除的格子
         Queue<Integer> queue = new ArrayDeque<>();
 
+        //区域内的格子入队
         for (int i = startRow; i <= endRow; i++) {
             for (int j = startCol; j <= endCol; j++) {
                 queue.offer(JellyAssistant.calculatePointNum(i, j));
@@ -70,32 +53,42 @@ public class JellyBomb {
         }
 
         while (!queue.isEmpty()) {
+
+            //取出1个待消除的格子，计算其行列值
             int pointNum = queue.poll();
             int pointRow = JellyAssistant.calculateRowByPointNum(pointNum);
             int pointCol = JellyAssistant.calculateColByPointNum(pointNum);
-            char bomb = array[pointRow][pointCol];
-            if (bomb != BOMB_NONE) {
-                array[pointRow][pointCol] = BOMB_NONE;
-                if (bomb != BOMB_NORMAL) {
+
+            //获取果冻类型
+            char jelly = array[pointRow][pointCol];
+            if (jelly != JELLY_NONE) {//若该格子无果冻则不处理
+
+                //先把该格子果冻清理掉
+                array[pointRow][pointCol] = JELLY_NONE;
+
+                //炸弹果冻特殊处理
+                if (jelly != JELLY_NORMAL) {
+                    //根据炸弹类型获得与该格子相关联的所有格子
                     int[] relatedNum = null;
-                    switch (bomb) {
-                        case BOMB_HORIZONTAL: {
+                    switch (jelly) {
+                        case JELLY_HORIZONTAL: {
                             relatedNum = getRelatedPointByHorizontal(pointNum);
                             break;
                         }
-                        case BOMB_VERTICAL: {
+                        case JELLY_VERTICAL: {
                             relatedNum = getRelatedPointByVertical(pointNum);
                             break;
                         }
-                        case BOMB_SQUARE: {
+                        case JELLY_SQUARE: {
                             relatedNum = getRelatedPointBySquare(pointNum);
                             break;
                         }
                     }
 
                     if (relatedNum != null) {
+                        //相关联的格子，如果有未消除的果冻，则进入待消除队列
                         for (int num : relatedNum) {
-                            if (getBombByPointNum(array, num) != BOMB_NONE) {
+                            if (getJellyByPointNum(array, num) != JELLY_NONE) {
                                 queue.offer(num);
                             }
                         }
@@ -104,15 +97,22 @@ public class JellyBomb {
             }
         }
 
+        //所有可消除的果冻已全部处理，按列进行下落操作
         dropByCol(array);
     }
 
-    private static int getBombByPointNum(char[][] array, int pointNum) {
+    /**
+     * 获得指定布局中指定格子的果冻类型
+     */
+    private static char getJellyByPointNum(char[][] array, int pointNum) {
         int pointRow = JellyAssistant.calculateRowByPointNum(pointNum);
         int pointCol = JellyAssistant.calculateColByPointNum(pointNum);
         return array[pointRow][pointCol];
     }
 
+    /**
+     * 获得指定格子横向关联的所有格子（不包括格子本身）
+     */
     private static int[] getRelatedPointByHorizontal(int pointNum) {
         int[] result = new int[JellyManager.JELLY_ARRAY_COL_COUNT - 1];
         int pointRow = JellyAssistant.calculateRowByPointNum(pointNum);
@@ -127,6 +127,9 @@ public class JellyBomb {
         return result;
     }
 
+    /**
+     * 获得指定格子纵向关联的所有格子（不包括格子本身）
+     */
     private static int[] getRelatedPointByVertical(int pointNum) {
         int[] result = new int[JellyManager.JELLY_ARRAY_ROW_COUNT - 1];
 
@@ -142,6 +145,9 @@ public class JellyBomb {
         return result;
     }
 
+    /**
+     * 获得指定格子周围八个方向关联的所有格子（不包括格子本身）
+     */
     private static int[] getRelatedPointBySquare(int pointNum) {
 
         int pointRow = JellyAssistant.calculateRowByPointNum(pointNum);
@@ -167,26 +173,29 @@ public class JellyBomb {
     }
 
     /**
-     * 按列下落炸弹，空位随机补充炸弹
+     * 按列下落果冻，空位随机补充果冻
      */
     private static void dropByCol(char[][] array) {
         int rowCount = array.length;
         int colCount = array[0].length;
 
+        //逐列下落
         for (int col = 0; col < colCount; col++) {
             int writeIndex = rowCount - 1;
             int readIndex = writeIndex;
 
+            //将未消除的果冻放到最下端
             while (readIndex >= 0) {
-                if (array[readIndex][col] != BOMB_NONE) {
+                if (array[readIndex][col] != JELLY_NONE) {
                     array[writeIndex--][col] = array[readIndex][col];
                 }
 
                 readIndex--;
             }
 
+            //剩余的位置随机补充果冻
             while (writeIndex >= 0) {
-                array[writeIndex][col] = randomBomb();
+                array[writeIndex][col] = randomJelly();
 
                 writeIndex--;
             }

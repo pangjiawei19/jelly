@@ -21,7 +21,6 @@ public class TestServlet extends HttpServlet {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         PrintWriter writer = response.getWriter();
-        writer.println("xxxxxxxxxxxxxx");
-        writer.println("BBBBBBBBBBBBBB");
+        writer.println("It's working!");
     }
 }
