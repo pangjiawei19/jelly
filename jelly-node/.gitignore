@@ -1,0 +1,11 @@
+node_modules
+.idea
+coverage
+public/components
+log
+public/unity
+.scannerwork
+package-lock.json
+launch.json
+.eslintrc.js
+
